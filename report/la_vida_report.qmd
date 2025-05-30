@@ -19,7 +19,7 @@ execute:
 library(tidyverse)
 library(gt)
 
-lavida_disco_attempts <- read_csv("../data/analysis_data/lavida_disco_attempts.csv")
+lavida_disco_attempts <- read_csv("data/analysis_data/lavida_disco_attempts.csv")
 ```
 
 ## Wilderness Expedition and Discovery attempts
