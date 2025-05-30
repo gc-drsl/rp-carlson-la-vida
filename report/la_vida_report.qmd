@@ -8,19 +8,33 @@ format:
     toc: true
     toc-location: left
     number-sections: true
+execute: 
+  eval: true
+  echo: false
+  warning: false
+  message: false
 ---
+
+```{r setup}
+library(tidyverse)
+library(gt)
+
+lavida_disco_attempts <- read_csv("../data/analysis_data/lavida_disco_attempts.csv")
+```
 
 ## Wilderness Expedition and Discovery attempts
 
 Since academic year 2010-2011, 7,445 attempts to complete either PED 015 Discovery or PED 016 La Vida Wilderness Expedition have been made by 6,691 students.
 
-**Summary**
+::: callout-note
+### Section summary
 
--   Over time, Gordon students have become less likely to attempt the La Vida Wilderness Expedition (LVWE).
+-   Over time, Gordon students have become less likely to attempt the La Vida Wilderness Expedition.
 
--   Among those who do participate in the LVWE during their first year, increasingly more are doing so the summer before entering as freshman.
+-   Among those who do participate in the Wilderness Expedition during their first year, increasingly more are doing so the summer before entering as freshman.
 
 -   Over the last 15 academic year, Discovery has largely been attempted during one of the first two quads.
+:::
 
 ::: panel-tabset
 ## Relative participation
@@ -35,3 +49,105 @@ Since academic year 2010-2011, 7,445 attempts to complete either PED 015 Discove
 
 ![](images/disco_quads-02.png)
 :::
+
+## Course outcomes
+
+::: callout-note
+### Section summary
+
+-   Pass rates for both the Wilderness Expedition and Discovery are consistently high (in the mid- to high-90s), though Discovery pass rates are generally slightly lower
+
+-   Fail and withdraw rates tend be slightly lower among students attempting the Wilderness Expedition
+:::
+
+### Pass, fail, withdraw rates
+
+Of the 7,445 attempts examined above, 956 (12.8%) ended as dropped courses. A course may be dropped by a student for scheduling reasons, or a section may be cancelled (appearing in Jenzabar as a drop) due to low enrollment, insufficient staffing, or health and safety concerns. The tables below were built using data that excluded dropped course attempts.
+
+::: callout-tip
+#### Tip: interactive table sorting
+
+You can click on any column name in the tables below to sort in either ascending ↑ (smallest to largest), or descending ↓ (largest to smallest) order.
+:::
+
+::: panel-tabset
+#### Wilderness Expedition
+
+```{r grade-outcomes-lvwe}
+lavida_disco_attempts |>
+  filter(TRANSACTION_STS != "C") |>
+  filter(TRANSACTION_STS != "D") |>
+  filter(ENTRY_YR >= 2010) |>
+  filter(ADV_REQ_CDE == "PED016") |>
+  group_by(ENTRY_YR, GRADE_CDE) |>
+  summarize(COUNT = n()) |>
+  ungroup() |>
+  complete(ENTRY_YR, GRADE_CDE,
+           fill = list(COUNT = 0)) |>
+  mutate(GRADE_CDE = case_when(
+    GRADE_CDE == "F" ~ "Fail",
+    GRADE_CDE == "P" ~ "Pass",
+    GRADE_CDE == "W" ~ "Withdraw"
+  )) |>
+  group_by(ENTRY_YR) |>
+  mutate(PERCENT = round((COUNT / sum(COUNT)) * 100, 1)) |>
+  ungroup() |>
+  mutate(Percent = str_c(PERCENT, "% (", COUNT, ")"),
+         .keep = "unused") |>
+  pivot_wider(names_from = GRADE_CDE,
+              values_from = Percent) |>
+  rename(`Cohort Year` = ENTRY_YR) |>
+  select(`Cohort Year`, Pass, Fail, Withdraw) |>
+  gt() |>
+  tab_spanner_delim(delim = "_",
+                    columns = !`Cohort Year`,
+                    split = "first",
+                    limit = 2,
+                    reverse = TRUE) |>
+  opt_interactive(
+    use_pagination = FALSE,
+    use_resizers = TRUE,
+  )
+```
+
+#### Discovery
+
+```{r grade-outcomes-disco}
+lavida_disco_attempts |>
+  filter(TRANSACTION_STS != "C") |>
+  filter(TRANSACTION_STS != "D") |>
+  filter(ENTRY_YR >= 2010) |>
+  filter(ADV_REQ_CDE == "PED015") |>
+  group_by(ENTRY_YR, GRADE_CDE) |>
+  summarize(COUNT = n()) |>
+  ungroup() |>
+  complete(ENTRY_YR, GRADE_CDE,
+           fill = list(COUNT = 0)) |>
+  mutate(GRADE_CDE = case_when(
+    GRADE_CDE == "F" ~ "Fail",
+    GRADE_CDE == "P" ~ "Pass",
+    GRADE_CDE == "W" ~ "Withdraw"
+  )) |>
+  group_by(ENTRY_YR) |>
+  mutate(PERCENT = round((COUNT / sum(COUNT)) * 100, 1)) |>
+  ungroup() |>
+  mutate(Percent = str_c(PERCENT, "% (", COUNT, ")"),
+         .keep = "unused") |>
+  pivot_wider(names_from = GRADE_CDE,
+              values_from = Percent) |>
+  rename(`Cohort Year` = ENTRY_YR) |>
+  select(`Cohort Year`, Pass, Fail, Withdraw) |>
+  gt() |>
+  tab_spanner_delim(delim = "_",
+                    columns = !`Cohort Year`,
+                    split = "first",
+                    limit = 2,
+                    reverse = TRUE) |>
+  opt_interactive(
+    use_pagination = FALSE,
+    use_resizers = TRUE,
+  )
+```
+:::
+
+### Course evaluations
