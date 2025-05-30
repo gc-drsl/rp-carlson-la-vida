@@ -1,0 +1,54 @@
+---
+title: "analysis"
+format: html
+---
+
+## Motivation
+
+From Chris Carlson in an email dated 05/23/25
+
+> Is there a time where we could look at student Lav Vida and Discovery participation across 10-15 years, with some common academic/institutional metrics, but also variables that might be interesting to evaluate.
+
+Completions:
+
+-   Students who did La Vida before arrival, and those who did it in May of their first year after end of term
+
+-   Discovery in Q1, Q2, or Q4
+
+-   If they had to Re-Take Discovery?
+
+**Main:**  
+
+-   Overall FY Gordon GPA, and compared to their HS GPA 
+
+-   FY retention rate (if they left, when did they participate?)
+
+-   Persistence (if tjhey left before degree completion or not)
+
+-   4Y and 6Y grad rate, never finished
+
+**Comparisons:**
+
+-   Financial Aid Tier
+
+-   Family Resources or (previous) Estimated Family Contribution
+
+-   Race/Ethnicity (white/non-white, if there’s not enough participants for analysis in segments)
+
+-   Is/was an NCAA rostered athlete and by sport
+
+-   By academic program or use current School groupings
+
+-   Is there an Advancement giving or Alumni engagement metric?
+
+-   Any way to tell if they married a Gordon alum? (Ha!)
+
+-   And, what clever ones can you think of?
+
+## Packages
+
+## Data import
+
+## Analysis
+
+### Completions and course outcomes
