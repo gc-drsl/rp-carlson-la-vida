@@ -7,7 +7,7 @@ format: html
 
 From Chris Carlson in an email dated 05/23/25
 
-> Is there a time where we could look at student Lav Vida and Discovery participation across 10-15 years, with some common academic/institutional metrics, but also variables that might be interesting to evaluate.
+> Is there a time where we could look at student La Vida and Discovery participation across 10-15 years, with some common academic/institutional metrics, but also variables that might be interesting to evaluate.
 
 Completions:
 
@@ -47,8 +47,22 @@ Completions:
 
 ## Packages
 
+```{r packages}
+library(tidyverse)
+```
+
 ## Data import
+
+```{r data-import}
+
+```
 
 ## Analysis
 
 ### Completions and course outcomes
+
+#### Overall participation since 2010 (15 academic years)
+
+```{r overall-participation}
+lavida_disco_attempts
+```
