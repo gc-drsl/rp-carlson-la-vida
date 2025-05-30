@@ -1,6 +1,6 @@
 ---
 title: "La Vida Participation and Outcomes Analysis"
-author: "Prepared by Sam Mason for the Institutional Research Office"
+author: "Institutional Research Office"
 date: "2025-05-30"
 format:
   html:
