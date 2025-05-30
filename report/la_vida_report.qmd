@@ -16,12 +16,10 @@ execute:
 ---
 
 ```{r setup}
-install.packages("tidyverse")
-install.packages("gt")
-library(tidyverse)
+library(dplyr)
 library(gt)
 
-lavida_disco_attempts <- read_csv("data/analysis_data/lavida_disco_attempts.csv")
+lavida_disco_attempts <- read_csv("https://raw.githubusercontent.com/gc-drsl/rp-carlson-la-vida/refs/heads/main/data/analysis_data/lavida_disco_attempts.csv")
 ```
 
 ## Wilderness Expedition and Discovery attempts
