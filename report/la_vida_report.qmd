@@ -16,7 +16,7 @@ execute:
 ---
 
 ```{r setup}
-library(dplyr)
+library(tidyverse)
 library(gt)
 
 lavida_disco_attempts <- read_csv("https://raw.githubusercontent.com/gc-drsl/rp-carlson-la-vida/refs/heads/main/data/analysis_data/lavida_disco_attempts.csv")
