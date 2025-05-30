@@ -54,15 +54,216 @@ library(tidyverse)
 ## Data import
 
 ```{r data-import}
-
+lavida_disco_attempts <- read_csv("../data/analysis_data/lavida_disco_attempts.csv")
 ```
 
 ## Analysis
 
-### Completions and course outcomes
+### Attempts, completions and course outcomes
 
 #### Overall participation since 2010 (15 academic years)
 
 ```{r overall-participation}
-lavida_disco_attempts
+lavida_disco_attempts |>
+  filter(TRANSACTION_STS != "C") |> # current enrollments
+  pull(ID_NUM) |>
+  unique() |>
+  length()
+```
+
+There have been 7,445 attempts at completing PED 015 and PED 016 made by 6,691 unique students.
+
+#### Participation breakdown by PED 015 and PED 016
+
+```{r relative-participation}
+lavida_disco_attempts |>
+  filter(YR_CDE < "2025") |>
+  filter(ENTRY_YR >= 2010) |>
+  mutate(ADV_REQ_CDE = if_else(ADV_REQ_CDE == "PED015", "Discovery",
+    "Wilderness Expedition"
+  )) |>
+  mutate(ADV_REQ_CDE = factor(ADV_REQ_CDE,
+    levels = c("Wilderness Expedition", "Discovery")
+  )) |>
+  ggplot(aes(y = 1)) +
+  geom_bar(aes(fill = ADV_REQ_CDE),
+    position = "fill"
+  ) +
+  geom_text(
+    data = lavida_disco_attempts |>
+      filter(ENTRY_YR >= 2010) |>
+      group_by(ENTRY_YR, ADV_REQ_CDE) |>
+      summarize(count = n()) |>
+      mutate(
+        prop = count / sum(count),
+        perc = round(prop * 100, 0),
+        PERC = str_c(perc, "%")
+      ) |>
+      filter(ADV_REQ_CDE == "PED016") |>
+      select(ENTRY_YR, PERC),
+    mapping = aes(x = 0, y = -0.5, label = PERC),
+    color = "#006D22",
+    fontface = "bold"
+  ) +
+  scale_fill_manual(values = c("#006D22", "#4D9964")) +
+  facet_wrap(~ENTRY_YR, ncol = 5) +
+  coord_polar(direction = -1) +
+  ylim(c(-0.5, 2)) +
+  labs(
+    x = NULL, y = NULL, fill = NULL,
+    title = "Proportionally more students choose Discovery in recent years",
+    subtitle = str_wrap("Each facet corresponds to a particular incoming cohort. The percentage of students participating in the La Vida Wilderness Expedition (reported for each student cohort year) has been dropping since 2010.", 100)
+  ) +
+  theme(panel.background = element_blank(),
+        panel.grid = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.ticks = element_blank(),
+        strip.background = element_rect(fill = "gray90"),
+        legend.position = "top",
+        legend.key.size = unit(0.8, "lines"),
+        plot.title.position = "plot",
+        plot.tag = element_path(size = 2.8,
+                                vjust = 0, hjust = 0,
+                                alpha = 0.5),
+        plot.tag.location = "plot",
+        plot.tag.position = c(0, 0),
+        text = element_text(family = "jost",
+                            color = "gray30"),
+        axis.text = element_blank(),
+        strip.text = element_text(face = "bold",
+                                  color = "gray30"),
+        plot.title = element_text(family = "neuton",
+                                  size = 16),
+        plot.subtitle = element_text(face = "italic",
+                                     size = 10,
+                                     color = "gray60"),
+        plot.caption = element_text(face = "italic",
+                                    size = 7,
+                                    color = "gray60"))
+
+ggsave("../plots/relative_participation_donuts.png",
+       dpi = 600,
+       height = 5.5,
+       width = 6)
+```
+
+#### First-year Wilderness Expedition participation, before or after?
+
+```{r fy-before-after}
+lavida_disco_attempts |>
+  filter(YR_CDE < "2025") |>
+  filter(YR_LA_VIDA_TAKEN == "First") |>
+  filter(ENTRY_YR >= 2010) |>
+  mutate(PRE_POST_FY = factor(PRE_POST_FY,
+    levels = c("Before", "After")
+  )) |>
+  ggplot(aes(y = 1)) +
+  geom_bar(aes(fill = PRE_POST_FY),
+    position = "fill"
+  ) +
+  geom_text(
+    data = lavida_disco_attempts |>
+      filter(YR_CDE < "2025") |>
+      filter(YR_LA_VIDA_TAKEN == "First") |>
+      filter(ENTRY_YR >= 2010) |>
+      group_by(ENTRY_YR, PRE_POST_FY) |>
+      summarize(count = n()) |>
+      mutate(
+        prop = count / sum(count),
+        perc = round(prop * 100, 0),
+        PERC = str_c(perc, "%")
+      ) |>
+      filter(PRE_POST_FY == "Before") |>
+      select(ENTRY_YR, PERC),
+    mapping = aes(x = 0, y = -0.5, label = PERC),
+    color = gc_pal$gordon_blue,
+    fontface = "bold"
+  ) +
+  scale_fill_manual(values = c(gc_pal$gordon_blue, gc_pal$scottie_cyan)) +
+  facet_wrap(~ENTRY_YR, ncol = 5) +
+  coord_polar(direction = -1) +
+  ylim(c(-0.5, 2)) +
+  labs(
+    x = NULL, y = NULL, fill = NULL,
+    title = str_wrap("Increasingly more students who participate in the Wilderness Expedition do so during the summer before their first year", 70),
+    subtitle = str_wrap("Each facet corresponds to a particular incoming cohort. The percentage of students participating in the La Vida Wilderness Expedition before their first year (reported for each student cohort year) has been increasing since 2010. The reversal in the 2020 cohort is due to the COVID-19 pandemic.", 95)
+  ) +
+  theme(panel.background = element_blank(),
+        panel.grid = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.ticks = element_blank(),
+        strip.background = element_rect(fill = "gray90"),
+        legend.position = "top",
+        legend.key.size = unit(0.8, "lines"),
+        plot.title.position = "plot",
+        plot.tag = element_path(size = 2.8,
+                                vjust = 0, hjust = 0,
+                                alpha = 0.5),
+        plot.tag.location = "plot",
+        plot.tag.position = c(0, 0),
+        text = element_text(family = "jost",
+                            color = "gray30"),
+        axis.text = element_blank(),
+        strip.text = element_text(face = "bold",
+                                  color = "gray30"),
+        plot.title = element_text(family = "neuton",
+                                  size = 16),
+        plot.subtitle = element_text(face = "italic",
+                                     size = 10,
+                                     color = "gray60"),
+        plot.caption = element_text(face = "italic",
+                                    size = 7,
+                                    color = "gray60"))
+
+ggsave("../plots/before_after_donuts.png",
+       dpi = 600,
+       height = 5.89,
+       width = 6)
+```
+
+#### Discovery quad breakdown
+
+```{r discovery-quad-breakdown}
+lavida_disco_attempts |>
+  filter(ADV_REQ_CDE == "PED015") |>
+  filter(YR_CDE < "2025") |>
+  drop_na(SUBTERM_CDE) |>
+  ggplot(aes(x = SUBTERM_CDE)) +
+  geom_bar(fill = "#4D9964") +
+  facet_wrap(~YR_CDE, ncol = 5) +
+  labs(x = NULL, y = "Attempts",
+       title = "Discovery is most often attempted during the fall semester",
+       subtitle = str_wrap("Each facet corresponds to a particular academic year. Given weather conditions, Discovery is not offered during the third quad, except in AY 2020 when a remote section was offered.", 95)) +
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_line(color = "gray90",
+                                        linewidth = 0.25),
+        panel.grid.minor = element_blank(),
+        axis.ticks = element_line(color = "gray90",
+                                  linewidth = 0.25),
+        strip.background = element_rect(fill = "gray90"),
+        legend.position = "bottom",
+        legend.key.size = unit(0.8, "lines"),
+        plot.title.position = "plot",
+        plot.tag = element_path(size = 2.8,
+                                vjust = 0, hjust = 0,
+                                alpha = 0.5),
+        plot.tag.location = "plot",
+        plot.tag.position = c(0, 0),
+        text = element_text(family = "jost",
+                            color = "gray30"),
+        strip.text = element_text(face = "bold",
+                                  color = "gray30"),
+        plot.title = element_text(family = "neuton",
+                                  size = 16),
+        plot.subtitle = element_text(face = "italic",
+                                     size = 10,
+                                     color = "gray60"),
+        plot.caption = element_text(face = "italic",
+                                    size = 7,
+                                    color = "gray60"))
+
+ggsave("../plots/disco_quads.png",
+       dpi = 600,
+       height = 4.75,
+       width = 6)
 ```

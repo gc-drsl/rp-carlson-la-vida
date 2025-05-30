@@ -1,4 +1,24 @@
 ---
-title: "la_vida_report"
+title: "La Vida Participation and Outcomes Analysis"
+author: "Prepared by Sam Mason for the Institutional Research Office"
+date: "2025-05-30"
 format: html
 ---
+
+## Wilderness Expedition and Discovery attempts
+
+Since academic year 2010-2011, 7,445 attempts to complete either PED 015 Discovery or PED 016 La Vida Wilderness Expedition have been made by 6,691 students.
+
+::: panel-tabset
+## Relative participation
+
+![](images/relative_participation_donuts.png)
+
+## Before or after FY
+
+![](images/before_after_donuts.png)
+
+## Discovery quads
+
+![](images/disco_quads-02.png)
+:::
