@@ -16,6 +16,8 @@ execute:
 ---
 
 ```{r setup}
+install.packages("tidyverse")
+install.packages("gt")
 library(tidyverse)
 library(gt)
 
