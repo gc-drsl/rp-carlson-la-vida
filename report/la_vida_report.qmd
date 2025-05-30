@@ -2,12 +2,25 @@
 title: "La Vida Participation and Outcomes Analysis"
 author: "Prepared by Sam Mason for the Institutional Research Office"
 date: "2025-05-30"
-format: html
+format:
+  html:
+    smooth-scroll: true
+    toc: true
+    toc-location: left
+    number-sections: true
 ---
 
 ## Wilderness Expedition and Discovery attempts
 
 Since academic year 2010-2011, 7,445 attempts to complete either PED 015 Discovery or PED 016 La Vida Wilderness Expedition have been made by 6,691 students.
+
+**Summary**
+
+-   Over time, Gordon students have become less likely to attempt the La Vida Wilderness Expedition (LVWE).
+
+-   Among those who do participate in the LVWE during their first year, increasingly more are doing so the summer before entering as freshman.
+
+-   Over the last 15 academic year, Discovery has largely been attempted during one of the first two quads.
 
 ::: panel-tabset
 ## Relative participation
