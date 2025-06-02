@@ -155,15 +155,31 @@ lavida_disco_attempts |>
 #### Wilderness Expedition
 
 ::: panel-tabset
-##### Awaken faith
-
-![](images/la_vida_faith-01.png)
-
 ##### Course overall
 
 ![](images/la_vida_overall-01.png)
 
+##### Awakens faith
+
+![](images/la_vida_faith-01.png)
+
 ##### Powerful experience
 
-![](images/la_vida_powerful_exp-01.png)
+![](images/la_vida_powerful_exp-02.png)
+:::
+
+#### Discovery
+
+::: panel-tabset
+## Course overall
+
+![](images/disco_overall.png)
+
+## Awakens faith
+
+![](images/disco_faith.png)
+
+## Recommend
+
+![](images/disco_recommend.png)
 :::
