@@ -601,3 +601,5 @@ ggsave("../plots/disco_recommend.png",
        height = 4,
        width = 6)
 ```
+
+#### Comparison to Common Core
