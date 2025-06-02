@@ -90,7 +90,7 @@ core_evals |>
   filter(str_detect(question, "Overall, I rate this course as")) |>
   distinct(questionid)
 
-data <- core_evals |>
+core_evals |>
   filter(
     questionid %in% c(
       "I4570LAT8R", # At this point, would you say La Vida continues to be a powerful experience in your life?
@@ -102,9 +102,14 @@ data <- core_evals |>
   ) |>
   mutate(
     # make a la vida/discovery/core indicator column
-    group = case_when(crs_number == "PED 015" ~ "Discovery",
+    group = case_when(
+      crs_number == "PED 015" ~ "Discovery",
       crs_number == "PED 016" ~ "La Vida",
-      .default = "Core"
+      crs_number == "BCM 101" ~ "Old Testament",
+      crs_number == "BCM 103" ~ "New Testament",
+      crs_number %in% c("COR 107", "COR 110") ~ "TGC",
+      crs_number == "HIS 121" ~ "Historical Perspectives",
+      crs_number == "NSM 202" ~ "TSE"
     ),
     # make a question column name column
     question_short = case_when(
@@ -126,10 +131,11 @@ data <- core_evals |>
   ) |>
   ungroup() |>
   mutate(part_svyid = paste0(part_svyid, counter)) |>
-  select(period, part_svyid, group, question_short, response) |>
+  select(period, part_svyid, group, question_short, response, response_descr) |>
   pivot_wider(
     names_from = question_short,
-    values_from = response
-  )
+    values_from = c(response, response_descr)
+  ) ->
+data
 
 write_csv(data, "data/analysis_data/course_evals.csv")

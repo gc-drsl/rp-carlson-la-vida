@@ -151,3 +151,15 @@ lavida_disco_attempts |>
 :::
 
 ### Course evaluations
+
+#### Wilderness Expedition
+
+::: panel-tabset
+## Awaken faith
+
+![](images/la_vida_faith.png)
+
+## Course overall
+
+![](images/la_vida_overall.png)
+:::
