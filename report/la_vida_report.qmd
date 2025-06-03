@@ -187,4 +187,4 @@ lavida_disco_attempts |>
 
 #### Comparison to Common Core
 
-![](images/eval_comps.png)
+![](images/eval_comps-01.png)

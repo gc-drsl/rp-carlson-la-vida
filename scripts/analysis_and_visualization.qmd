@@ -653,7 +653,7 @@ eval_faith_comp |>
             hjust = 1,
             nudge_y = -0.065,
             show.legend = FALSE,
-            size = 3,
+            size = 2.8,
             family = "jost") +
   geom_segment(x = 5, xend = 5,
                y = 0.95, yend = 1.05,
@@ -762,7 +762,7 @@ eval_overall_comp |>
             hjust = 1,
             nudge_y = -0.065,
             show.legend = FALSE,
-            size = 3,
+            size = 2.8,
             family = "jost") +
   geom_segment(x = 5, xend = 5,
                y = 0.95, yend = 1.05,
