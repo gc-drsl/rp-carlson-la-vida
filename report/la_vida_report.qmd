@@ -172,15 +172,19 @@ lavida_disco_attempts |>
 #### Discovery
 
 ::: panel-tabset
-## Course overall
+##### Course overall
 
 ![](images/disco_overall.png)
 
-## Awakens faith
+##### Awakens faith
 
 ![](images/disco_faith.png)
 
-## Recommend
+##### Recommend
 
 ![](images/disco_recommend.png)
 :::
+
+#### Comparison to Common Core
+
+![](images/eval_comps.png)
