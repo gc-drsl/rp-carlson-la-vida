@@ -45,6 +45,17 @@ student_crs_hist <- tbl(jenzabar, "STUDENT_CRS_HIST")
 student_div_mast <- tbl(jenzabar, "STUDENT_DIV_MAST")
 year_term_table <- tbl(jenzabar, "YEAR_TERM_TABLE")
 
+retention_ug <- dbConnect(odbc(),
+  driver = "/opt/homebrew/lib/libmsodbcsql.17.dylib",
+  server = "adminprodsql.gordon.edu",
+  port = 1433,
+  database = "RetentionUG",
+  uid = "sam.mason",
+  pwd = keyring::key_get("adminprodsql")
+)
+
+retention_student_detail <- tbl(retention_ug, "RETENTION_STUDENT_DETAIL")
+
 # Pulling the enrollment data from Jenzabar -------------------------------
 
 student_crs_hist |>
@@ -172,3 +183,21 @@ lavida_disco
 # Writing La Vida / Discovery enrollments to file -------------------------
 
 write_csv(lavida_disco, "data/imported_data/lavida_disco_all_enroll.csv")
+
+# Pulling the retention data
+
+retention_student_detail |>
+  filter(COHORT_YR >= 2021) |>
+  filter(COHORT_TYPE == "FTFT") |>
+  select(CENSUS_YR, CENSUS_TRM, COHORT_YR, COHORT_TRM,
+    ID_NUM, GENDER, RELIGION_DESC, IPEDS_DESC,
+    COMMUTER, ATHLETE, COHORT_PELL,
+    MAJOR_1, MAJOR_2, MAJOR_3,
+    HIGH_SCHOOL_GPA, FIRST_SEMESTER_GPA,
+    FIRST_YR_GPA = GPA,
+    RETAINED, SEMESTER_NUM, ADJUSTED_COHORT
+  ) |>
+  collect() ->
+retention
+
+write_csv(retention, "data/imported_data/retention.csv")

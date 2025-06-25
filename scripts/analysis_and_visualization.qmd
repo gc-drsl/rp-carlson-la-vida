@@ -50,6 +50,7 @@ Completions:
 ```{r packages}
 library(tidyverse)
 library(patchwork)
+library(rstanarm)
 ```
 
 ## Data import
@@ -58,6 +59,8 @@ library(patchwork)
 lavida_disco_attempts <- read_csv("../data/analysis_data/lavida_disco_attempts.csv")
 
 course_evals <- read_csv("../data/analysis_data/course_evals.csv")
+
+retention_finances <- read_csv("../data/analysis_data/retention_finances.csv")
 ```
 
 ## Analysis
@@ -271,17 +274,17 @@ ggsave("../plots/disco_quads.png",
        width = 6)
 ```
 
-## Course outcomes
+### Course outcomes
 
-### Pass, fail, withdraw rates
+#### Pass, fail, withdraw rates
 
 This analysis is done directly in la_vida_report.qmd to render it as a sortable {gt} table.
 
-### Course evaluations
+#### Course evaluations
 
 La Vida and Discovery course evaluations from the previous three years with a comparison to other core classes commonly taken in the first two years.
 
-#### Wilderness Expedition surveys
+##### Wilderness Expedition surveys
 
 These surveys look at: (1) how has this class awakened your Christian faith?, (2) how would you rate this class overall?, (3) does La Vida continue to be a powerful experience in your life?
 
@@ -443,7 +446,7 @@ ggsave("../plots/la_vida_powerful_exp.png",
        width = 6)
 ```
 
-#### Discovery
+##### Discovery
 
 ```{r discovery-awakens-faith-plot}
 course_evals |>
@@ -603,7 +606,7 @@ ggsave("../plots/disco_recommend.png",
        width = 6)
 ```
 
-#### Comparison to Common Core
+##### Comparison to Common Core
 
 ```{r common-core-comp}
 course_evals |>
@@ -831,3 +834,88 @@ ggsave("../plots/eval_comps.png",
        height = 4,
        width = 6)
 ```
+
+```{r}
+course_evals |>
+  group_by(group) |>
+  summarize(n = n(),
+            sd = sd(overall_course, na.rm = T))
+```
+
+### Retention modeling exploration
+
+#### How many people in this dataset didn't make it to their 2nd year?
+
+What about FTFT that arrive in the spring? My gut says to group them with the folks who arrived in the fall of the same academic year.
+
+```{r lost-students}
+retention_finances |>
+  filter((COHORT_TRM == "FA" & SEMESTER_NUM == 3) | (COHORT_TRM == "SP" & SEMESTER_NUM == 2)) |>
+  filter(CENSUS_YR != 2025) |>
+  filter(ADJUSTED_COHORT == 1) |>
+  count(RETAINED)
+```
+
+#### Do academic struggles increase a students probability to leave?
+
+If they arrive in the spring, the only GPA in their first "year" is their first semester GPA.
+
+```{r retention-vs-gpa}
+retention_finances |>
+  filter((COHORT_TRM == "FA" & SEMESTER_NUM == 3) | (COHORT_TRM == "SP" & SEMESTER_NUM == 2)) |>
+  filter(CENSUS_YR != 2025) |>
+  filter(ADJUSTED_COHORT == 1) |>
+  mutate(GPA = if_else(COHORT_TRM == "FA",
+                       FIRST_YR_GPA,
+                       FIRST_SEMESTER_GPA)) |>
+  ggplot() +
+  stat_summary(aes(x = factor(RETAINED), y = GPA))
+```
+
+#### Does financial burden increase a students probability to leave?
+
+```{r retention-vs-fin-burden}
+# calculating average first year financial burden
+retention_finances |>
+  filter(CENSUS_YR == COHORT_YR) |>
+  filter(CENSUS_YR != 2025) |>
+  group_by(ID_NUM) |>
+  summarize(AVG_BURDEN = mean(remain_all_aid_applied, na.rm = T)) ->
+  avg_fy_financial_burden
+  
+# joining burden to retention 
+retention |>
+  filter((COHORT_TRM == "FA" & SEMESTER_NUM == 3) | (COHORT_TRM == "SP" & SEMESTER_NUM == 2)) |>
+  filter(CENSUS_YR != 2025) |>
+  filter(ADJUSTED_COHORT == 1) |>
+  left_join(avg_fy_financial_burden,
+            by = "ID_NUM") |>
+  ggplot() +
+  geom_density(aes(x = AVG_BURDEN,
+                   fill = factor(RETAINED)),
+               alpha = 0.5,
+               color = NA)
+  # stat_summary(aes(x = factor(RETAINED),
+  #                  y = AVG_BURDEN))
+  # stat_summary(aes(x = factor(RETAINED),
+  #                  y = AVG_BURDEN,
+  #                  color = COHORT_PELL))
+```
+
+```{r exploratory-burden-modeling}
+stan_glm(formula = RETAINED ~ AVG_BURDEN*COHORT_PELL,
+         family = binomial(link = "logit"),
+         data = retention |>
+           filter(COHORT_TRM == "FA") |>
+           filter(SEMESTER_NUM == 3) |>
+           filter(CENSUS_YR != 2025) |>
+           filter(ADJUSTED_COHORT == 1) |>
+           left_join(avg_fy_financial_burden,
+                     by = "ID_NUM") |>
+           mutate(AVG_BURDEN = AVG_BURDEN / 1000)) |>
+  summary(digits = 5)
+```
+
+Not particularly. There is a lot going on here. A financial "burden" is only a burden if you don't have the ability to pay it comfortably. We don't have any information
+
+### Retention modeling

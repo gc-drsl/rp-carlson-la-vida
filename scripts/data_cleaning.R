@@ -1,6 +1,9 @@
 library(tidyverse)
+library(janitor)
 
 lavida_disco <- read_csv("data/imported_data/lavida_disco_all_enroll.csv")
+student_finances <- read_csv("data/imported_data/student_finances.csv")
+retention <- read_csv("data/imported_data/retention.csv")
 
 # There are many instances of students changing sections during add/drop. This
 # shows up in the data as a student, in a given term, dropping one section with
@@ -46,3 +49,37 @@ lavida_disco_attempts |>
 lavida_disco_attempts
 
 write_csv(lavida_disco_attempts, "data/analysis_data/lavida_disco_attempts.csv")
+
+# Cleaning student financial data -----------------------------------------
+
+## standardizing names
+student_finances |>
+  clean_names() ->
+student_finances
+
+## Splitting academic year and term
+student_finances |>
+  separate_wider_position(
+    cols = term,
+    widths = c(
+      "term" = 2,
+      "year" = 4
+    )
+  ) ->
+student_finances
+
+# Joining retention and finances ------------------------------------------
+
+retention |>
+  left_join(
+    student_finances |>
+      select(id_num, term, year, remain_all_aid_applied),
+    by = join_by(
+      ID_NUM == id_num,
+      CENSUS_YR == year,
+      CENSUS_TRM == term
+    )
+  ) ->
+ret_fin
+
+write_csv(ret_fin, "data/analysis_data/retention_finances.csv")
